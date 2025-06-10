@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>427 Logo Shader (WebGL2)</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#000}
+canvas#glcanvas{
+position:absolute;
+top:50%;left:50%;transform:translate(-50%,-50%);
+width:40vmin;height:20vmin;
+}
+</style>
+</head>
+<body>
+<canvas id="glcanvas"></canvas>
+<script type="module">
+const canvas=document.getElementById('glcanvas'),gl=canvas.getContext('webgl2');
+if(!gl)throw new Error();
+function resize(){
+const dpr=window.devicePixelRatio||1;
+canvas.width=canvas.clientWidth*dpr;
+canvas.height=canvas.clientHeight*dpr;
+gl.viewport(0,0,canvas.width,canvas.height);
+}
+new ResizeObserver(resize).observe(canvas);resize();
+const v=`#version 300 es
+precision highp float;
+in vec2 aPos;
+void main(){gl_Position=vec4(aPos,0.,1.);} `;
+const f=`#version 300 es
+precision highp float;
+uniform vec2 iResolution;uniform float iTime;out vec4 o;
+#define C4 0xf0,0x88,0,0x88,0xCC,0x82,0,0x82,0xFC|
+#define C2 0xFC,0xA2,0,0xA2,0,0x8A,0,0x8A,0xFC|
+#define C7dot 0xFC,0xA2,0,0xA2,0x0C,0x8A,0,0x8A,0xFC|
+#define Cg 0xFC,0x8A,0,0x8A,0x20,0x82,0,0x82,0xFC|
+#define Ca 0xFC,0xA2,0,0xA2,0x10,0x82,0,0x82,0xFC|
+#define Cm 0xFC,0x82,0,0x82,0x3C,0x82,0,0x82,0x3C,0x82,0,0x82,0xFC|
+#define Ce 0xFC,0x82,0,0x82,0x40,0x8A,0,0x8A,0xFC|
+#define Cs 0xFC,0x8A,0,0x8A,0,0xA2,0,0xA2,0xFC|
+#define Ct 0xFC,0x82,0,0x82,0xC0,0x2A,0,0x2A,0x3C|
+#define CT 0xFC,0xA0,0,0xA0,0x3C,0x82,0,0x82,0x3C,0xA0,0,0xA0,0xFC|
+#define Co 0xFC,0x82,0,0x82,0x30,0x82,0,0x82,0xFC|
+#define Cl 0xFC,0x82,0,0x82,0xF0,0x0A,0,0x0A,0x0C|
+#define Cd 0x8C,0x22,0,0x22,0xD0,0x82,0,0x82,0xFC|
+#define Cr 0xFC,0x82,0,0x82,0x3C,0xA0,0,0xA0,0xC0|
+#define Ch 0xFC,0x82,0,0x82,0xCC,0x22,0,0x22,0x3C|
+#define A(X) ivec4(X[i.x],X[i.x],X[i.z+1],X[i.x+1])>>i.wyyy&1;
+const int c0[]=int[](C4 C2 C7dot Cg Ca Cm Ce Cs 0,0);
+const int c2[]=int[](C4 C2 C7dot Ca Cs Cs Ce Ct Cs 0,0);
+const int c3[]=int[](C4 C2 C7dot Ct Co Co Cl Cs 0,0);
+const int c1[]=int[](C4 C2 C7dot Cs Ch Ca Cd Ce Cr Cs 0,0);
+const int ln[]=int[](c0.length(),c1.length(),c2.length(),c3.length());
+void mainImage(out vec4 O,in vec2 U){
+vec3 R=vec3(iResolution,0.);
+float v=.4,s=30.;
+U=U/R.y;
+U*=s;
+int t=int(iTime*.5)%4;
+float l=float(ln[t]/4);
+U.x-=(R.x*s/R.y)/2.-l;
+U.y-=s/2.5;
+vec4 m=vec4(fract(U),v,1.-v);m=step(m.xxww,m.zzyy);
+ivec4 i=ivec4(U,U+vec2(-v,v));i.xz*=2;
+ivec4 a[4];
+a[0]=A(c0)
+a[1]=A(c1)
+a[2]=A(c2)
+a[3]=A(c3)
+i=a[t];
+O=vec4(dot(vec4(i),m))*step(0.,U.x);
+}
+void main(){vec4 c;mainImage(c,gl_FragCoord.xy);o=c;}`;
+function S(t,s){const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(sh);return sh;}
+const p=gl.createProgram();
+gl.attachShader(p,S(gl.VERTEX_SHADER,v));
+gl.attachShader(p,S(gl.FRAGMENT_SHADER,f));
+gl.linkProgram(p);
+if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw gl.getProgramInfoLog(p);
+gl.useProgram(p);
+const b=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,b);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+const l=gl.getAttribLocation(p,'aPos');
+gl.enableVertexAttribArray(l);
+gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+const r=gl.getUniformLocation(p,'iResolution'),t0=gl.getUniformLocation(p,'iTime');
+let s0=performance.now();
+function d(n){n=(n-s0)*1e-3;gl.uniform2f(r,canvas.width,canvas.height);gl.uniform1f(t0,n);gl.drawArrays(gl.TRIANGLES,0,6);requestAnimationFrame(d);}requestAnimationFrame(d);
+</script>
+</body>
+</html>
