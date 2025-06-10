@@ -58,7 +58,7 @@ float v=.4,s=30.;
 U=U/R.y;
 U*=s;
 int t=int(iTime*.5)%4;
-float l=float(ln[t]/4);
+float l=float(ln[0]/4);
 U.x-=(R.x*s/R.y)/2.-l;
 U.y-=s/2.5;
 vec4 m=vec4(fract(U),v,1.-v);m=step(m.xxww,m.zzyy);
