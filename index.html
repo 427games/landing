@@ -17,8 +17,8 @@ const f=`#version 300 es
 precision highp float;
 uniform vec2 R;uniform float T;out vec4 F;
 const uint r[21]=uint[21](0u,0u,0x111075c1u,0x11113119u,0x22226d4cu,0x2222319bu,0x33336d4du,0x33343199u,0x555565ceu,0x55553519u,0x5555e45cu,0x55553119u,0x5555655du,0x55552119u,0x55553119u,0x5555654cu,0x55553199u,0x555565ccu,0x55553919u,0u,0u);
-const vec3 l[6]=vec3[6](vec3(0,0,0), vec3(1,0,.4), vec3(1,.5,0), vec3(1,.9,0), vec3(.6,0,1), vec3(.3,0,1));
-void mainImage(out vec4 O,in vec2 U){vec2 u=U/R.y*15.0-vec2(3.0,6.0);vec2 t=vec2(.5);vec2 s=step(fract(u),t);uint a,b,c;uvec4 i=uvec4(u,u-t);uvec4 x=uvec4(a=r[i.x],b=r[++i.x],b,b);uvec4 y=uvec4(a,c=r[++i.z],b,c);uvec4 w=i.yyyy;uvec4 z=uvec4(i.w,--w.y,i.w,i.y);vec3 k=l[(b>>(w.x*4u)+16u)&15u];uvec4 m=(x>>(w*4u))|(y>>(z*4u));vec4 d=vec4(m&uvec4(1u,2u,4u,8u));O=(vec4(k,1.0)-dot(d,s.xyxy))*vec4(4.0+t.x>u.y&&u.y>0.0);}void main(){vec4 col;mainImage(col,gl_FragCoord.xy);F=col;}`;
+const vec3 l[6]=vec3[6](vec3(0), vec3(1,0,.4), vec3(1,.5,0), vec3(1,.9,0), vec3(.6,0,1), vec3(.3,0,1));
+void mainImage(out vec4 O,in vec2 U){vec2 u=U/R.y*15.-vec2(4.,6.);vec2 t=vec2(.5);vec2 s=step(fract(u),t);uint a,b,c;uvec4 i=uvec4(u,u-t);uvec4 x=uvec4(a=r[i.x],b=r[++i.x],b,b);uvec4 y=uvec4(a,c=r[++i.z],b,c);uvec4 w=i.yyyy;uvec4 z=uvec4(i.w,--w.y,i.w,i.y);vec3 k=l[(b>>(w.x*4u)+16u)&15u];uvec4 m=(x>>(w*4u))|(y>>(z*4u));vec4 d=vec4(m&uvec4(1u,2u,4u,8u));O=(vec4(k,1.)-dot(d,s.xyxy))*vec4(4.+t.x>u.y&&u.y>0.);}void main(){vec4 col;mainImage(col,gl_FragCoord.xy);F=col;}`;
 function h(t,s){const sh=g.createShader(t);g.shaderSource(sh,s);g.compileShader(sh);if(!g.getShaderParameter(sh,g.COMPILE_STATUS))throw g.getShaderInfoLog(sh);return sh;}
 const p=g.createProgram();g.attachShader(p,h(g.VERTEX_SHADER,v));g.attachShader(p,h(g.FRAGMENT_SHADER,f));g.linkProgram(p);if(!g.getProgramParameter(p,g.LINK_STATUS))throw g.getProgramInfoLog(p);g.useProgram(p);
 const q=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,q);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),g.STATIC_DRAW);const a=g.getAttribLocation(p,'aPos');g.enableVertexAttribArray(a);g.vertexAttribPointer(a,2,g.FLOAT,false,0,0);
