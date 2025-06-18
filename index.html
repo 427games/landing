@@ -12,7 +12,7 @@ const c=document.getElementById('glcanvas'),g=c.getContext('webgl2');if(!g)throw
 function s(){const d=window.devicePixelRatio||1;c.width=c.clientWidth*d;c.height=c.clientHeight*d;g.viewport(0,0,c.width,c.height);}new ResizeObserver(s).observe(c);s();
 const v=`#version 300 es
 precision highp float;
-in vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);} `;
+in vec2 aPos;void main(){gl_Position=vec4(aPos,0.,1.);} `;
 const f=`#version 300 es
 precision highp float;
 uniform vec2 R;uniform float T;out vec4 F;
